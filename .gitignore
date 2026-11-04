@@ -15,6 +15,9 @@ htmlcov/
 # Build and packaging output
 build/
 dist/
+/ffmpeg.exe
+/ffprobe.exe
+tests/performance/generated/
 
 # Local application data and logs
 settings.json

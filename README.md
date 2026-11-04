@@ -10,6 +10,12 @@ The confirmed product direction, workflow, safety requirements, and open decisio
 
 The implementation language is Python. CustomTkinter is the preferred GUI framework under consideration, not yet an approved dependency. Exact runtime and development dependencies will be selected after architecture approval. No dependency installation is required to review these planning documents.
 
+The initial target is 64-bit Windows 10 and Windows 11. Windows 10 Home/Pro reached end of support on October 14, 2025; see the platform assessment in [Architecture](docs/ARCHITECTURE.md#platform-and-packaging-assessment).
+
+## Portable data
+
+The intended portable mode stores settings, cache, and logs beside the executable when that directory is writable. If it is not, the proposal is to use a predictable per-user fallback and tell the user which location is active. See the storage proposal in [Architecture](docs/ARCHITECTURE.md#portable-data-location). The exact fallback behavior remains subject to review.
+
 ## Legacy reference
 
 Bulk Media Validator is reference material only. Validata is greenfield: no legacy source, configuration, test data, or packaging files are part of this repository.
