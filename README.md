@@ -8,9 +8,9 @@ The confirmed product direction, workflow, safety requirements, and open decisio
 
 ## Development
 
-The implementation language is Python. CustomTkinter is the preferred GUI framework under consideration, not yet an approved dependency. Exact runtime and development dependencies will be selected after architecture approval. No dependency installation is required to review these planning documents.
+The implementation language is Python. CustomTkinter is the preferred GUI framework, pending final technical evaluation. No application functionality is implemented yet.
 
-The initial target is 64-bit Windows 10 and Windows 11. Windows 10 Home/Pro reached end of support on October 14, 2025; see the platform assessment in [Architecture](docs/ARCHITECTURE.md#platform-and-packaging-assessment).
+The target is Windows 11, 64-bit only. Windows 10 is not a Validata target.
 
 ## Portable data
 
@@ -22,4 +22,4 @@ Bulk Media Validator is reference material only. Validata is greenfield: no lega
 
 ## License
 
-Project licensing has not yet been decided. FFmpeg redistribution also requires a build-specific license and notices review before release.
+Validata's source-code license is MIT. The copyright holder and year still need to be supplied before a complete `LICENSE` file can be added; no name has been inferred. Third-party components have separate terms. The supplied FFmpeg/FFprobe binaries are GPLv3-configured; see [Third-party notices](docs/THIRD_PARTY_NOTICES.md). Their redistribution strategy has not been approved.

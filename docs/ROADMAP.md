@@ -9,13 +9,14 @@ This is a proposed sequence of work, not an approved feature schedule. Release d
 
 ## Stage 1 — Technical spikes and decisions
 
-- Confirm Python version and supported Windows 10/11 policy; test a CustomTkinter shell with ttk Treeview and packaging behavior.
+- Confirm minimum Python version for the Windows 11 x64 target; complete CustomTkinter evaluation with ttk Treeview and packaging behavior.
 - Define first-release supported formats and evidence-based profile checks.
 - Prototype bounded task/event queues, publish-discovery-before-enqueue ordering, cancellation, completion accounting, and responsiveness using synthetic datasets.
 - Approve portable data fallback, copy isolation, visibility/migration behavior; validate file identity strategies for safe Purge.
-- Resolve whether the supplied GPLv3 static FFmpeg/FFprobe build fits Validata's licensing model and arrange matching sources/notices, or evaluate another build.
+- Obtain owner approval for FFmpeg redistribution strategy; verify matching Corresponding Source and dependency notices or evaluate another build.
 - Specify Counter detection and manual configuration behavior with representative naming examples.
 - Approve staged first-release format coverage; validate profile inheritance and method definitions.
+- Obtain the MIT copyright holder/year and establish icon asset provenance before creating complete license/attribution materials.
 
 ## Stage 2 — Application foundation
 
@@ -44,3 +45,7 @@ This is a proposed sequence of work, not an approved feature schedule. Release d
 - Complete dependency inventory, FFmpeg license/notice/source handling, version metadata, and release documentation.
 
 No Validator or Counter implementation is included in the current foundation assignment.
+
+## Proposed next milestone
+
+Recommend **Handover 2.0 — Application Foundation** only after the owner has reviewed and approved the remaining architecture choices that affect the shell, job lifecycle, storage, and release dependency model. That handover should authorize a narrowly scoped foundation (package shell, GUI/event bridge, job coordinator, settings/cache/logging, and tests) while continuing to defer Validator and Counter behavior until separately approved.

@@ -4,7 +4,8 @@ All notable changes to Validata are recorded here.
 
 ## Unreleased
 
-- Refine architecture for the approved Windows 10/11 64-bit target, portable data storage, bounded event flow, profile inheritance, and session-only validation results.
-- Record initial format-coverage recommendations and the FFmpeg/FFprobe 8.0 Gyan essentials-build audit, including GPLv3 licensing concerns.
+- Record the Windows 11 x64 target, MIT source license, refined requirements, and owner decisions still open.
+- Replace the superseded FFmpeg 8.0 audit with the supplied 9.0.2 Gyan Essentials baseline, verified fingerprints, and GPLv3 distribution investigation.
+- Add a dedicated third-party notices and licensing record.
 - Establish initial project documentation and technical proposals from the approved handover.
 - No application features implemented.
