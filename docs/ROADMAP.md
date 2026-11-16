@@ -13,7 +13,7 @@ This is the next work stage before implementing Validator or Counter behavior.
 
 - Establish technically meaningful v1.0.0 extension coverage and evidence-based per-format checks across all five approved categories.
 - Benchmark Quick/Balanced/Thorough methods, configurable timeouts, decoding/reading limits, and truthful result classifications.
-- Prototype bounded task/event queues, publish-discovery-before-enqueue ordering, cancellation, completion accounting, and responsiveness using synthetic datasets.
+- **Handover 2.1 delivered:** bounded task/event queues, publish-discovery-before-enqueue ordering, cancellation, completion accounting, and a 1,000-file synthetic workload. Extend with 10k/50k Treeview and memory measurements before making scalability claims.
 - Verify portable read/write probing, `%LOCALAPPDATA%\Validata\` fallback, visible active path, settings/cache persistence, and atomic cache writes.
 - Validate file-identity/Purge behavior, cancellation of external processes, and symlink/junction traversal policies on Windows 11.
 - Specify Counter inference confidence, sequence grammar, and ambiguity UX using representative examples.
@@ -24,7 +24,7 @@ This is the next work stage before implementing Validator or Counter behavior.
 ## Stage 2 — Application foundation
 
 - **Handover 2.0 foundation delivered:** package structure, GUI shell and workspaces, shared results tables, portable storage resolver, settings, logging, bounded event pump, and foundational tests.
-- Future work may add domain result models and a job coordinator after technical spikes define their contracts.
+- **Handover 2.1 infrastructure delivered:** Validator source selection, progressive streaming discovery, bounded FIFO work queue and fixed workers, cancellation, accounting, and main-thread results updates. No validation adapters or Counter processing.
 - Keep per-file results in transient job state for v1; no permanent history/database.
 
 ## Stage 3 — Validator capability
@@ -52,4 +52,4 @@ No Validator or Counter implementation is included in the current foundation ass
 
 ## Next milestone
 
-Proceed with the **Stage 1 technical spikes** for format/profile evidence, timeouts, Counter grammar, storage edge cases, and Purge identity. The foundation shell deliberately has no Validator or Counter processing. Keep implementation within the approved read-only and safety boundaries.
+Continue the **Stage 1 technical spikes** for format/profile evidence, timeouts, Counter grammar, storage edge cases, and Purge identity. Before adding Validator adapters, measure larger Treeview workloads and exercise cancellation against slow or disconnected filesystem paths. Handover 2.1 only discovers files and dispatches no-op infrastructure tasks; keep future implementation within the approved read-only and safety boundaries.

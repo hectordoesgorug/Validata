@@ -35,7 +35,7 @@ In a packaged portable build, storage is beside the executable when writable; ot
 
 The approved future FFmpeg/FFprobe model is user-managed and optional: Validata will not download, bundle, or redistribute them in v1.0.0. External-tool setup and validation integration are not implemented yet. See [Third-party notices](docs/THIRD_PARTY_NOTICES.md).
 
-The current GUI is structural only. File/folder selection, validation, Counter analysis, and other processing controls are unavailable; no results are simulated.
+The Validator workspace accepts file and folder sources, discovers regular files progressively, and dispatches bounded infrastructure tasks. Results currently end as **Not Validated**: file-integrity checks and format adapters are not implemented. The Counter workspace remains structural only. See [Architecture](docs/ARCHITECTURE.md) for discovery, queue, cancellation, and progress semantics.
 
 ## Legacy reference
 

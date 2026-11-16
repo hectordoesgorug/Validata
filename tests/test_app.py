@@ -1,6 +1,7 @@
 import tkinter as tk
 from pathlib import Path
-from threading import Thread
+from threading import Event, Thread
+from time import monotonic
 
 import pytest
 
@@ -25,7 +26,10 @@ def test_gui_startup_and_appearance_persistence_when_display_is_available(tmp_pa
     except tk.TclError as exc:
         pytest.skip(f"no graphical session is available: {exc}")
 
-    application = create_application(storage_paths=StoragePaths(tmp_path / "data", "development"))
+    try:
+        application = create_application(storage_paths=StoragePaths(tmp_path / "data", "development"))
+    except tk.TclError as exc:
+        pytest.skip(f"Tkinter runtime is unavailable: {exc}")
     try:
         application.root.withdraw()
         application.root.update()
@@ -71,5 +75,68 @@ def test_gui_startup_and_appearance_persistence_when_display_is_available(tmp_pa
         application.run()
         assert application._closing
     finally:
+        if not application._closing:
+            application.close()
+
+
+def test_validator_progress_cancel_and_close_are_main_thread_managed(tmp_path: Path) -> None:
+    try:
+        probe = tk.Tk()
+        probe.withdraw()
+        probe.destroy()
+    except tk.TclError as exc:
+        pytest.skip(f"no graphical session is available: {exc}")
+
+    source = tmp_path / "sample 日本語.txt"
+    source.write_text("fixture", encoding="utf-8")
+    try:
+        application = create_application(storage_paths=StoragePaths(tmp_path / "data", "development"))
+    except tk.TclError as exc:
+        pytest.skip(f"Tkinter runtime is unavailable: {exc}")
+    entered = Event()
+    release = Event()
+
+    def blocked_handler(_task):
+        entered.set()
+        assert release.wait(5)
+        return "Not Validated"
+
+    application.root.withdraw()
+    application.job_controller.task_handler = blocked_handler
+    try:
+        application._add_sources((source,))
+        assert application.validator_view.start_button.cget("state") == "normal"
+        application.start_job()
+        assert entered.wait(5)
+        deadline = monotonic() + 5
+        while application.validator_view.results.tree.get_children() == () and monotonic() < deadline:
+            application.root.update()
+        rows = application.validator_view.results.tree.get_children()
+        assert len(rows) == 1
+        assert application.validator_view.results.tree.item(rows[0], "values")[0] == source.name
+        assert application.validator_view.cancel_button.cget("state") == "normal"
+        application.job_controller.cancel()
+        release.set()
+        deadline = monotonic() + 5
+        while application._current_job_id is not None and monotonic() < deadline:
+            application.root.update()
+        assert application._current_job_id is None
+        assert application.validator_view.status_label.cget("text").startswith("Cancelled")
+        assert application.validator_view.start_button.cget("state") == "normal"
+
+        entered.clear()
+        release.clear()
+        application.start_job()
+        assert entered.wait(5)
+        application.close()
+        assert application._close_requested
+        assert application.root.winfo_exists()
+        release.set()
+        deadline = monotonic() + 5
+        while not application._closing and monotonic() < deadline:
+            application.root.update()
+        assert application._closing
+    finally:
+        release.set()
         if not application._closing:
             application.close()

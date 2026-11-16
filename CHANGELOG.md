@@ -4,6 +4,10 @@ All notable changes to Validata are recorded here.
 
 ## Unreleased
 
+- Add Validator file/folder source selection, streaming recursive discovery, duplicate suppression for overlapping paths, and progressive result rows.
+- Add a bounded FIFO task queue, two-worker default pool, job IDs and lifecycle accounting, cooperative cancellation, and close-after-cancel behavior. Infrastructure tasks report **Not Validated**; no file contents are read and integrity validation remains unavailable.
+- Skip directory symlinks and junctions; accept accessible file symlinks and report broken links as discovery errors. Document bounded event backpressure and filesystem-call cancellation limits.
+- Add deterministic discovery/job tests and a synthetic 1,000-file tree workload; see Architecture for environment and measured result.
 - Implement the Python 3.13 package foundation, CustomTkinter shell with Validator/Counter workspaces, shared ttk results tables, Settings, portable storage resolver, atomic JSON settings, rotating logging, and bounded main-thread event pump.
 - Add foundational pytest coverage and PowerShell development setup/launch documentation.
 - Keep all file processing unavailable; no Validator or Counter behavior is simulated.
