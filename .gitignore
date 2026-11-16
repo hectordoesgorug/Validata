@@ -2,6 +2,8 @@
 __pycache__/
 *.py[cod]
 .venv/
+.python/
+/.validata-data/
 venv/
 ENV/
 
@@ -15,6 +17,7 @@ htmlcov/
 # Build and packaging output
 build/
 dist/
+*.egg-info/
 /ffmpeg.exe
 /ffprobe.exe
 tests/performance/generated/

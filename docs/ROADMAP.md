@@ -2,12 +2,14 @@
 
 This is a proposed sequence of work, not an approved feature schedule. Release dates and scope are open.
 
-## Stage 0 — Foundation (current)
+## Stage 0 — Planning foundation (complete)
 
 - Record owner-approved requirements, architecture boundaries, and implementation details still requiring technical work.
 - Keep the approved target at Windows 11 x64/Python 3.13 x64 with the approved Tkinter GUI stack and user-managed optional FFmpeg/FFprobe.
 
 ## Stage 1 — Technical spikes and decisions
+
+This is the next work stage before implementing Validator or Counter behavior.
 
 - Establish technically meaningful v1.0.0 extension coverage and evidence-based per-format checks across all five approved categories.
 - Benchmark Quick/Balanced/Thorough methods, configurable timeouts, decoding/reading limits, and truthful result classifications.
@@ -21,9 +23,8 @@ This is a proposed sequence of work, not an approved feature schedule. Release d
 
 ## Stage 2 — Application foundation
 
-- Create the approved package structure, domain result models, settings/cache schema, logging, and job lifecycle.
-- Add focused unit and integration test fixtures; do not commit generated stress datasets.
-- Add the approved GUI shell and main-thread event bridge.
+- **Handover 2.0 foundation delivered:** package structure, GUI shell and workspaces, shared results tables, portable storage resolver, settings, logging, bounded event pump, and foundational tests.
+- Future work may add domain result models and a job coordinator after technical spikes define their contracts.
 - Keep per-file results in transient job state for v1; no permanent history/database.
 
 ## Stage 3 — Validator capability
@@ -51,4 +52,4 @@ No Validator or Counter implementation is included in the current foundation ass
 
 ## Next milestone
 
-Recommend **Handover 2.0 — Application Foundation** as the next milestone. Its scope should implement the approved package shell, GUI/event bridge, job coordinator, settings/cache/logging, and tests. Validator and Counter capabilities should follow the technical spikes and retain the approved read-only and safety boundaries.
+Proceed with the **Stage 1 technical spikes** for format/profile evidence, timeouts, Counter grammar, storage edge cases, and Purge identity. The foundation shell deliberately has no Validator or Counter processing. Keep implementation within the approved read-only and safety boundaries.

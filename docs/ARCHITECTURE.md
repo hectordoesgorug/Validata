@@ -1,29 +1,25 @@
 # Architecture Proposal
 
-**Status: architecture direction established; implementation details remain proposals unless marked confirmed in Requirements or Decisions.** No application implementation is authorized by this handover.
+**Status: Handover 2.0 foundation implemented.** The package shell, GUI workspaces, settings, storage resolver, logging, and UI event pump are implemented. Validator/Counter processing, worker scheduling, and format adapters are not. Other technical details remain proposals unless marked confirmed in Requirements or Decisions.
 
-## Proposed source layout
+## Current source layout
 
 ```text
 src/validata/
-├── app.py                 # composition root and application lifecycle
-├── presentation/          # GUI views, dialogs, and main-thread presenters
-├── application/           # use cases, job orchestration, and result policies
-├── discovery/             # iterative filesystem traversal and file records
-├── validation/            # dispatcher, profiles, result types, adapters
-│   └── adapters/           # image, video, audio, archive, document strategies
-├── counter/               # pattern inference, manual rules, consistency analysis
-├── jobs/                  # cancellation, bounded work queues, worker lifecycle
-├── persistence/           # settings and cache interfaces/implementations
-├── logging_config.py
-└── resources/             # only app-owned resources, never legacy assets
+├── app.py                 # composition root, GUI shell, application lifecycle
+├── __main__.py            # `python -m validata` entry point
+├── core/events.py         # bounded event queue and main-thread event pump
+├── services/              # storage paths, JSON settings, logging setup
+└── ui/                    # Validator/Counter views, shared table, theme helper
 tests/
-├── unit/
-├── integration/
-└── performance/
+├── test_app.py
+├── test_events.py
+├── test_logging_setup.py
+├── test_paths.py
+└── test_settings.py
 ```
 
-Keep the GUI as a thin presentation layer. It submits commands and renders immutable job events/results; it should not own validation rules or filesystem traversal. Application services coordinate discovery, validation, Counter, persistence, and cleanup. Domain types (file snapshot, validation profile, validation result, sequence rule, Counter finding) should not depend on Tkinter or a particular persistence library.
+The composition root assembles services and views; the UI contains no validation or sequence-analysis logic. Keep future domain types and adapters independent of Tkinter and persistence details. Add layers only when their responsibilities are implemented.
 
 ## GUI framework
 
@@ -33,7 +29,9 @@ Retain a color-coded Treeview and include textual result labels so color is not 
 
 ## Concurrency and event flow
 
-Use one job coordinator with a producer for iterative discovery, a bounded FIFO task queue, a fixed worker pool, and a separate bounded event queue shared by producer/workers and polled by the UI thread. For each file, the scanner must: (1) discover it, (2) assign a stable job/file ID and capture a lightweight identity snapshot, (3) publish a compact `FileDiscovered` event, and only then (4) enqueue its validation task. Thus a full validation queue can pause further discovery only after the just-discovered file's row has been published. The UI can insert that row while the scanner waits for task capacity.
+The foundation implements `EventDispatcher` with a bounded FIFO queue (2,048 events) and `EventPump`, which polls every 40 ms and drains at most 100 events on the Tk thread. Events use frozen dataclasses and recursively read-only payload containers. No worker or job scheduler is started. Future job orchestration must preserve the confirmed queue/discovery ordering below.
+
+Use one job coordinator with a producer for iterative discovery, a bounded FIFO task queue, a fixed worker pool, and the bounded event queue polled by the UI thread. For each file, the scanner must: (1) discover it, (2) assign a stable job/file ID and capture a lightweight identity snapshot, (3) publish a compact `FileDiscovered` event, and only then (4) enqueue its validation task. Thus a full validation queue can pause further discovery only after the just-discovered file's row has been published. The UI can insert that row while the scanner waits for task capacity.
 
 The bounded task queue applies backpressure when workers lag. The bounded event queue applies backpressure if the GUI falls behind; it must not become an unbounded second backlog. Queue capacities should be fixed/configurable limits measured against compact event payloads. The main thread drains events on a short scheduled tick in bounded batches and never waits on queue puts or worker joins. If a worker is blocked publishing a result because the event queue is full, the UI remains able to drain it. Use a separate small/coalesced mechanism for replaceable progress counters so progress noise cannot crowd out discovery/results. Queue ownership is explicit: the coordinator owns task admission and job counts; scanner is the only task producer; workers are task consumers and event producers; UI is the only event consumer and the only owner of Treeview mutation.
 
@@ -67,9 +65,9 @@ Analysis returns structured findings: missing numbers/ranges, duplicate numbers,
 
 ### Portable data location
 
-**Approved portable layout:** `Validata.exe`, `settings.json`, `cache.json`, and `validata.log` in the executable directory when writable. Probe write access without risking existing data. If unavailable, use `%LOCALAPPDATA%\Validata\`; show the active path in Settings. Preserve settings/cache across updates and avoid silently distributing files across unrelated paths. Atomic persistence, recovery, and update handling are implementation-phase details. No per-copy fallback, migration, or path-hashing behavior is approved.
+**Implemented storage resolution:** packaged mode tries the executable directory; development mode tries `<project-root>/.validata-data/`. Both use a create/write/delete probe and fall back to `%LOCALAPPDATA%\Validata\`. If neither is writable, startup reports a `StorageError` and does not create alternate locations. The Settings window shows the resolved root. Settings/cache persistence across updates is required; no per-copy fallback, migration, or path-hashing behavior is approved.
 
-Define narrow settings/cache interfaces and version their serialized schemas. A small JSON settings file and compact cache are sufficient initially; detailed persistent validation history is out of scope, so no database is proposed. Cache entries need invalidation keys that include enough file identity and validation-method/profile version to avoid reusing stale results. Logs should be useful for diagnosis without unnecessary personal path exposure; define retention and redaction policy before release. The active storage location must be visible in the UI and included in diagnostic context.
+`SettingsStore` persists schema version 1 with appearance mode and window geometry. Defaults are created on first run. Loaded values are validated; malformed/unsupported files are copied to a timestamped `.bak` before recovery, and invalid fields fall back to defaults while valid fields are preserved. Writes use a same-directory temporary file, flush/fsync, then atomic replacement. `cache.json` is reserved; no cache schema or application validation results are implemented. Logging uses standard `RotatingFileHandler` with a 1,000,000-byte limit and three backups. Logging failure emits a warning and falls back safely. Logs avoid file contents; retention/redaction details remain for release review.
 
 **Approved dependency model:** FFmpeg/FFprobe are optional, user-managed external tools. Do not download, install, bundle, or redistribute them in v1.0.0. Provide the [Gyan download page](https://www.gyan.dev/ffmpeg/builds/), let users select the folder containing both executables, verify availability/version/compatibility, and persist configured paths. If either tool is missing at validation start, explain the missing executable and affected methods, explain that independent checks remain available, and offer Continue, Cancel, and Configure FFmpeg/FFprobe. Continue with independent methods; do not silently classify affected files Valid or Corrupted solely due to a missing tool. Keep executables outside Python imports and launch via safe argument lists, configured timeouts, bounded output, and reliable cancellation. Future redistribution requires separate owner and licensing review.
 

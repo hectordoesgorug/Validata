@@ -1,22 +1,41 @@
 # Validata
 
-Validata is a new Python desktop application planned around two equally important capabilities: file validation and sequence/consistency checking. This repository currently contains the project foundation and technical proposals; Validator and Counter are not implemented.
+Validata is a Python desktop application planned around two equally important capabilities: file validation and sequence/consistency checking. The application shell and workspace structures are implemented; Validator and Counter processing are not.
 
 ## Project status
 
-The confirmed product direction, workflow, safety requirements, and open decisions are recorded in [Requirements](docs/REQUIREMENTS.md). The proposed architecture and technical trade-offs are in [Architecture](docs/ARCHITECTURE.md). See [Decisions](docs/DECISIONS.md) for the distinction between confirmed decisions and proposals, and [Roadmap](docs/ROADMAP.md) for staged work.
+The confirmed product direction and safety requirements are in [Requirements](docs/REQUIREMENTS.md). Current foundation architecture and remaining technical work are in [Architecture](docs/ARCHITECTURE.md) and [Decisions](docs/DECISIONS.md); staged work is in [Roadmap](docs/ROADMAP.md).
 
 ## Development
 
-The implementation language is Python 3.13, 64-bit. The approved GUI stack is CustomTkinter for the primary interface, `ttk.Treeview` for results tables, and standard Tkinter utilities for native dialogs and supporting functionality. No application functionality is implemented yet.
+The target is Python 3.13 x64 on Windows 11 x64. The GUI uses CustomTkinter for the primary interface, `ttk.Treeview` for results tables, and standard Tkinter utilities for native dialogs. The foundation currently includes Validator and Counter workspaces, shared tables, Settings, portable storage resolution, JSON settings, rotating logs, and a bounded main-thread event pump.
 
-The target is Windows 11, 64-bit only. Windows 10 is not a Validata target.
+### Development setup (PowerShell)
+
+Install Python 3.13 x64, then from the repository root:
+
+```powershell
+py -3.13 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -e ".[dev]"
+python -m validata
+```
+
+Run the automated tests with:
+
+```powershell
+python -m pytest
+```
+
+`pyproject.toml` defines bounded dependencies (`customtkinter>=6,<7`, `pytest>=8,<10`). The foundation was verified with Python 3.13.17, CustomTkinter 6.0.0, and pytest 9.2.0.
 
 ## Portable data
 
-Portable mode stores `settings.json`, `cache.json`, and `validata.log` beside the executable when writable. Otherwise it uses `%LOCALAPPDATA%\Validata\`. Settings must show the active storage path. See [Architecture](docs/ARCHITECTURE.md#portable-data-location).
+In a packaged portable build, storage is beside the executable when writable; otherwise it uses `%LOCALAPPDATA%\Validata\`. During development it uses the ignored project-local `.validata-data/` directory, falling back to LocalAppData if needed. Settings displays the active directory. Settings are stored in `settings.json`; `cache.json` is reserved for future caching/exemptions; logs use `validata.log`.
 
-FFmpeg and FFprobe are user-managed optional dependencies: Validata will not download, bundle, or redistribute them in v1.0.0. Users can configure their independently obtained executable locations. Without these tools, validation methods that do not require them remain available; see [Third-party notices](docs/THIRD_PARTY_NOTICES.md).
+The approved future FFmpeg/FFprobe model is user-managed and optional: Validata will not download, bundle, or redistribute them in v1.0.0. External-tool setup and validation integration are not implemented yet. See [Third-party notices](docs/THIRD_PARTY_NOTICES.md).
+
+The current GUI is structural only. File/folder selection, validation, Counter analysis, and other processing controls are unavailable; no results are simulated.
 
 ## Legacy reference
 

@@ -22,7 +22,7 @@ This log separates owner-approved project decisions from implementation details 
 - Validation results are session-only; keep rows through the active job, remove Valid rows after full completion, preserve problematic results and aggregate counts. No permanent detailed history/database in v1.0.0.
 - Discovery publishes each file row before waiting on bounded FIFO validation queue admission. Main-thread UI updates, separate bounded queues, explicit job/cancellation states, and responsive cancellation remain required.
 - Releases use Semantic Versioning: `0.x.x` during development and `1.0.0` for the first stable release. Maintain `CHANGELOG.md`; use versioned tags; publish through GitHub Releases with SHA-256 checksums and dependency versions. Testing and explicit owner approval gate release.
-- No application functionality is authorized by this documentation handover. Codex must not commit, push, tag, or publish.
+- Handover 2.0 authorizes only the application foundation scope; Validator/Counter processing and other excluded features remain out of scope. Codex must not commit, push, tag, or publish without owner approval.
 
 ## Implementation details still requiring technical work
 
@@ -42,3 +42,7 @@ This log separates owner-approved project decisions from implementation details 
 Handover 1.2 recorded the supplied FFmpeg 9.0.2 Essentials binaries as static, GPLv3-configured builds. Local hashes matched owner-provided fingerprints but were not publisher-verified. Under Handover 1.3, the binaries are development-only; user-managed dependency policy replaces earlier packaging/distribution proposals. See [Third-party notices](THIRD_PARTY_NOTICES.md) for audit details and licensing limits.
 
 The previous handover left the icons untracked, but commit `a9bdb09` subsequently added both approved assets. They are now tracked and unchanged.
+
+## Handover 2.0 foundation
+
+The implemented initial package, GUI shell, portable storage resolver, settings, logging, and event pump are described in [Architecture](ARCHITECTURE.md). The Settings schema is version 1 and contains appearance mode and window geometry only; `cache.json` remains reserved. No validation, Counter, discovery, FFmpeg integration, Purge, or job scheduler behavior is implemented.
