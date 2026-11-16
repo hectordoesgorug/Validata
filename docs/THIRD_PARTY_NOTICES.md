@@ -1,10 +1,10 @@
 # Third-Party Notices and Licensing Record
 
-**Status: investigation record; redistribution strategy is not approved.** This document records the currently supplied FFmpeg/FFprobe pair and the questions that must be closed before release. It is not legal advice.
+**Status: owner-managed dependency policy approved for v1.0.0.** Validata will not download, bundle, or redistribute FFmpeg/FFprobe. This document records the separately licensed development binaries and their audit history; it is not legal advice.
 
 ## Validata source license
 
-Validata's own source-code license is confirmed as **MIT**. The repository does not establish the copyright holder or year. Do not create a final `LICENSE` file with an invented name; the owner must provide those details. This does not change the separate license of third-party executables.
+Validata source code is licensed under the **MIT License**, copyright (c) 2026 hectordoesgorug; see the root [LICENSE](../LICENSE). This does not change the separate license of third-party executables.
 
 ## FFmpeg and FFprobe baseline
 
@@ -47,7 +47,7 @@ Gyan lists the 9.0.2 Essentials package as its release build dated 2026-09-19 an
 
 Sources: [Gyan build/download page](https://www.gyan.dev/ffmpeg/builds/), [Gyan 9.0.2 release mirror](https://github.com/GyanD/codexffmpeg/releases/tag/9.0.2), [FFmpeg source revision for 9.0.2](https://github.com/FFmpeg/FFmpeg/commit/946fcce07b), [FFmpeg license guidance](https://ffmpeg.org/legal.html), and [GNU GPL version 3](https://www.gnu.org/licenses/gpl-3.0.html).
 
-The supplied files were inspected in place; they were not modified or replaced. Their embedded version string and matching configuration are consistent with Gyan's 9.0.2 Essentials build, but do not prove which archive they were extracted from. The Gyan page publishes archive checksums and an FFmpeg source revision. The archive itself, its README/license files, its checksum, exact external-library source revisions, and exact build scripts have not been retained or independently checked in this repository. Before redistribution, preserve or obtain the complete corresponding source materials and dependency notices for the exact binaries, plus the full build configuration and any patches/build scripts. Confirm that those materials actually correspond to these files.
+The supplied local files were inspected in place and remain untouched/ignored. Their embedded version string and matching configuration are consistent with Gyan's 9.0.2 Essentials build, but do not prove which archive they came from. The archive, its README/license files, publisher checksum, exact external-library source revisions, and exact build scripts have not been retained or independently checked here. They are development-only tools. If a future release proposes bundling or redistributing FFmpeg, separately obtain owner approval and review the exact corresponding source, dependency notices, configuration, build scripts, and legal obligations before making that change.
 
 ## Licensing obligations and interpretation
 
@@ -57,17 +57,14 @@ When conveying GPLv3 object code, GPLv3 section 6 requires providing the Corresp
 
 GPLv3 section 5 says inclusion of a covered program in an aggregate does not by itself apply GPL terms to the other separate works. Validata calls FFmpeg as a separate command-line process, but whether a particular integration/distribution is a mere aggregate or forms a combined work is a legal interpretation. Keep Validata's MIT source and the FFmpeg executables separately identified, licensed, and noticed; obtain legal review before claiming the MIT application is unaffected by a release configuration.
 
-PyInstaller one-file mode places bundled support files inside one executable, extracts them to a temporary directory at runtime, and removes that directory on normal exit. It changes the packaging artifact and file-access model; it does not remove the bundled FFmpeg license/source obligations. A one-file release must still include clear third-party notices and practical access to Corresponding Source, for example in the release page and accompanying source archive/offer. Users also need related documentation distributed separately. Keep the FFmpeg command-line tools as distinct executables inside the extracted bundle and invoke them as separate processes; do not statically link their code into Validata. [PyInstaller one-file operation](https://pyinstaller.org/en/stable/operating-mode.html).
+PyInstaller one-file mode places bundled support files inside one executable and extracts them to a temporary directory at runtime. This is recorded only for future packaging review: the approved v1.0.0 policy excludes FFmpeg/FFprobe from all bundles and release artifacts. If a future owner-approved proposal changes that policy, packaging mechanics do not remove licensing/source obligations, and the exact integration and compliance approach must be reviewed before release. [PyInstaller one-file operation](https://pyinstaller.org/en/stable/operating-mode.html).
 
-## Options for owner review — none approved
+## Approved v1.0.0 dependency policy
 
-1. **Do not redistribute the binaries:** leave video/audio validation dependent on a user-provided compatible FFmpeg installation. This avoids conveying these particular GPL binaries but affects portability and requires a supported tool-discovery policy.
-2. **Redistribute separate FFmpeg/FFprobe files:** keep Validata under MIT, distribute the GPL executables as clearly separate tools, and provide the GPL notices and complete corresponding-source access. Obtain legal review of the aggregate/distribution arrangement.
-3. **Bundle the separate executables in a one-folder or one-file Validata release:** technically compatible with spawning a separate process, but still conveys GPL object code. Provide notices and corresponding-source access with the release, retain the exact source/build materials, and obtain legal review of the aggregate/combined-work question.
-4. **Evaluate a different FFmpeg build:** only if its exact configuration and all dependency licenses/source obligations are audited. Do not assume a build is LGPL merely because it is called “essentials” or “shared”.
+FFmpeg/FFprobe are optional, user-managed tools. The application will provide the [Gyan download page](https://www.gyan.dev/ffmpeg/builds/), let users choose the folder containing both executables, check availability/version/compatibility, and persist their paths. No automatic download/install in v1.0.0. Do not put either binary in Git, PyInstaller bundles, portable ZIPs, or GitHub Releases. When a tool is unavailable, preserve checks that do not require it and report why dependent checks did not run; missing tools are not proof of corruption and must not yield a silent Valid result. The owner supplied the current local binaries solely as the development baseline; `.gitignore` excludes them.
 
-The owner has explicitly not approved an FFmpeg redistribution strategy. No binaries are tracked in Git; root `ffmpeg.exe` and `ffprobe.exe` are ignored by `.gitignore`.
+Any future proposal to distribute FFmpeg requires explicit owner approval and a separate licensing/source/notice review. The MIT license applies to Validata source only, not to these external tools.
 
-## Other user-supplied assets
+## Application icon assets
 
-The icon assets are present under `assets/` and are untracked. Their formats and readability were inspected, but their creator, copyright holder, and license/provenance are unknown. Establish permission/attribution before redistribution. Do not add them to a release notice or commit them until ownership/provenance is confirmed.
+The owner confirms `assets/icon.ico` and `assets/icon.png` were generated using ChatGPT and approves them for Validata branding. Both are tracked. The ICO opens with Windows icon decoding; the PNG opens as 1024×1024. Do not claim independently verified originality or copyright protection.

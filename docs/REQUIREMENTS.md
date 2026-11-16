@@ -1,6 +1,6 @@
 # Requirements
 
-Status labels distinguish confirmed handover requirements from proposals and unresolved questions. “Confirmed” means supplied in the Validata handover; it does not imply that implementation details are settled.
+Status labels distinguish confirmed owner decisions from technical implementation details that still require design, testing, or benchmarking.
 
 ## Product capabilities — confirmed
 
@@ -24,11 +24,11 @@ Track at least Discovered, Queued, Running, Completed, and Not started / cancell
 
 ## Profiles and result classifications
 
-The named profiles are **Quick**, **Balanced**, and **Thorough**; Balanced is the proposed default. Users should be able to set a global default and category overrides for Video, Audio, Images, Archives, and Documents. Each result records the applied profile. The inheritance behavior below is confirmed; exact profile methods and the result vocabulary remain proposals subject to technical approval.
+The named profiles are **Quick**, **Balanced**, and **Thorough**; the global default is **Balanced**. Users may set category overrides for Video, Audio, Images, Archives, and Documents. Each result records the effective profile and method. Exact per-format algorithms remain implementation decisions requiring technical evaluation and benchmarking.
 
-Methods and thresholds are not defined. Full video decoding may be expensive and is not assumed for every profile. FFmpeg and FFprobe are expected to be important for audio/video checks.
+Quick performs fast structural and metadata checks with minimal file reading. Balanced performs more comprehensive structural/readability checks without routinely decoding entire large media files. Thorough performs the deepest supported validation and may fully decode media or verify complete archive integrity. Methods and thresholds are not defined. FFmpeg/FFprobe are optional user-managed dependencies for relevant audio/video checks.
 
-The proposed result vocabulary is:
+The result vocabulary is:
 
 - Valid
 - Corrupted
@@ -40,7 +40,7 @@ The proposed result vocabulary is:
 
 Format-specific rules must explain the evidence behind a result and distinguish an actual integrity failure from an inability to check. Only results confidently classified as **Corrupted** may be eligible for bulk Purge.
 
-Sampled checks must be described as sampled; never present them as complete integrity verification. Full video decoding is not assumed for Balanced because it may be prohibitively expensive across the owner's hundreds of movie files.
+Sampled checks must be described as sampled; never present them as complete integrity verification. Full video decoding is not assumed for Balanced. Timeouts and environmental failures never establish corruption. Missing tools must not silently produce Valid results where required methods did not run.
 
 ### Profile inheritance — confirmed configuration behavior; methods remain open
 
@@ -52,23 +52,45 @@ Every discovered file remains in the working Treeview while a job is active; row
 
 ## Safety — confirmed
 
-Ordinary discovery, validation, and Counter operations never modify originals. Deletion is permitted only through the explicitly authorized Purge operation. Preserve confirmation dialogues, individual and bulk Purge, SHA-256-based exemptions, and exempt/de-exempt operations. Investigate verifying file identity or content again immediately before Purge so files changed since validation are not deleted based on stale results.
+Ordinary discovery, validation, and Counter operations never modify originals. Deletion is permitted only through the explicitly authorized Purge operation. Individual and bulk Purge require explicit confirmation. Before deletion, recheck path, size, modification time, and available filesystem identity; skip files that changed, disappeared, or cannot be verified and require revalidation. Purge must not follow symlinks or junctions to delete their targets. Avoid unnecessary SHA-256 recalculation.
 
-Only Corrupted results can be eligible for bulk Purge. Unsupported, Encrypted / Protected, Incomplete / Partially readable, Validation Error, and Skipped results are not bulk-purge eligible. No repair, rename, move, compression, or other source-file modification is permitted. Identical content should share exemption status; exemption persistence and invalidation remain open.
+Only confidently classified Corrupted results can be eligible for bulk Purge. Exempted files are excluded. Unsupported, Encrypted / Protected, Incomplete / Partially readable, Validation Error, and Skipped results are not bulk-purge eligible. No repair, rename, move, compression, or other source-file modification is permitted. Users can review, add, and remove SHA-256 exemptions. Exemptions persist in `cache.json`, apply to identical content across names/locations, and must be invalidated when content changes. Cache reuse is allowed only while file identity metadata remains consistent; update cache files atomically. Exemption storage remains logically distinct from temporary validation-result caching.
 
 ## Jobs and filesystem — confirmed goals; details open
 
 Preserve button blocking where it protects job consistency. Investigate graceful cancellation, stopping discovery, preventing queued files from starting, dealing safely with active workers, retaining completed results, and identifying unfinished work. Resumable jobs are not required for initial release unless investigation finds a compelling reason.
 
-Handle permission errors, files disappearing or changing during work, symlinks and junctions, long paths and names, and network interruptions. Do not silently suppress errors. Avoid expensive filesystem operations unless they are needed for correctness or safety. Not following directory symlinks/junctions recursively by default remains a recommendation, not an approved decision.
+Do not recursively follow directory symlinks or junctions in Validator or Counter. Detect traversal loops; do not duplicate paths through linked directories or overlapping selected roots. File symlinks may be validated through accessible targets; broken or inaccessible links receive a non-corruption error. Ordinary operations never modify link targets, and Purge never follows links to delete targets. Report inaccessible directories, permission failures, disappearing/changing files, long paths, and network interruptions explicitly rather than silently suppressing them. Counter recursively inspects selected folders, treating each folder's immediate files as a separate group by default.
 
 ## Deployment — confirmed target
 
-The eventual target is a portable Windows executable with no mandatory installation or administrator rights, plus predictable persistent settings and cache handling. A one-folder development build followed by a one-file release build is acceptable. FFmpeg licensing and redistribution compliance must be resolved for the exact binaries and configuration selected.
+The eventual target is a portable Windows executable with no mandatory installation or administrator rights. A one-folder development build followed by a one-file release build is acceptable. FFmpeg/FFprobe are user-managed optional dependencies and will not be bundled or redistributed in v1.0.0.
 
-The initial OS target is **Windows 11 64-bit only**. Windows 10 is explicitly out of scope; do not document Windows 10 as a Validata compatibility target.
+The supported platform is **Windows 11 64-bit only**, using **Python 3.13 64-bit**. Windows 10 and other operating systems are out of scope.
 
-Portable mode should place settings, cache, and logs beside the executable when writable. The application must not assume that directory is writable. A deterministic fallback, visible active-location indicator, update persistence, and behavior for multiple copies are required. The recommended fallback is documented as a proposal in [Architecture](ARCHITECTURE.md#portable-data-location).
+Portable mode places `settings.json`, `cache.json`, and `validata.log` beside the executable when writable, falling back to `%LOCALAPPDATA%\Validata\`. Settings must display the active location. Preserve settings and cache across application updates. Avoid silently scattering data among unrelated locations. Atomic persistence, recovery, and update handling are implementation-phase details; see [Architecture](ARCHITECTURE.md#portable-data-location).
+
+## GUI — confirmed
+
+Use CustomTkinter for the primary GUI, `ttk.Treeview` for results tables, and standard Tkinter utilities for native dialogs and supporting functionality. Widget operations run only on the main thread; workers communicate through thread-safe events/queues. Keep the GUI responsive during discovery, validation, and cancellation. Text labels must accompany status colors. Do not introduce another GUI or async framework without approval.
+
+## File-type detection — confirmed policy
+
+First use the filename extension to select an initial adapter. Where supported, verify content with signatures, headers, container metadata, or structural information. Report extension/content mismatches explicitly. Recognize extensionless files by signatures where feasible. Unknown extensions alone are not corruption. Avoid unnecessary full-file reads and never rename or modify source files.
+
+## First-release categories — confirmed
+
+Retain Images, Videos, Audio, Documents, and Archives as the five v1.0.0 categories. Do not treat the legacy extension inventory as approved coverage. Each supported extension needs a technically meaningful method; document reliable structural checks, partial readability checks, comprehensive checks, and unsupported/deferred formats separately. Exact extension lists and algorithms remain for subsequent technical work.
+
+## Counter defaults — confirmed
+
+Recursively inspect selected folders and subfolders without following directory symlinks/junctions. By default, each folder's immediate regular files form a separate sequence group, and all regular files are considered regardless of extension unless filtered. Infer numbering patterns automatically, present ambiguous candidates for user selection, and support manual pattern, start, increment, and grouping rules. Report gaps, duplicates, naming inconsistencies, and count discrepancies separately; a count mismatch alone does not prove missing numbers. Counter remains read-only.
+
+## Timeouts and external tools — confirmed policy
+
+Timeouts are configurable by adapter and profile: Quick shorter, Balanced moderate, Thorough longer. Exact values require testing and benchmarking. Timeouts never automatically establish corruption. Distinguish missing dependencies, permission failures, interrupted reads, and unavailable storage from corruption. Terminate external FFmpeg processes safely when cancellation or timeout requires it, and record why a check could not complete.
+
+Users select the folder containing both `ffmpeg.exe` and `ffprobe.exe`. Verify availability, version, and compatibility, and persist the configured locations. When either tool is missing at validation start, warn which executable is unavailable, explain which audio/video methods need it and that independent methods remain available. Offer **Continue**, **Cancel**, and **Configure FFmpeg/FFprobe**. A missing executable cannot alone yield Corrupted, and files for which required methods did not run must not silently be called Valid. Record the non-corruption reason. Continue must permit checks that do not need the missing tools.
 
 ## Performance and quality targets — confirmed test coverage
 
@@ -84,20 +106,21 @@ The proposed test strategy must cover workloads of 1,000, 10,000, and 50,000 fil
 
 ## Open questions
 
-1. Which formats are in the first release, and what file-type/extension/content-detection policy is authoritative?
-2. What exact Quick, Balanced, and Thorough methods and thresholds apply per format, including decode depth and time/resource limits? How are profile-definition changes migrated?
-3. How should timeout and environmental failures be classified while keeping them ineligible for Purge?
-4. Should the proposed `%LOCALAPPDATA%\Validata\PortableFallback\<copy-id>` fallback and migration behavior be approved?
-5. Which minimum 64-bit CPython version should be pinned for Windows 11 and the selected UI/package dependencies?
-6. Should CustomTkinter receive final approval after evaluating theme, accessibility, Windows 11 behavior, Treeview integration, packaging, maintainability, and testability?
-7. Which sequence grammar, grouping, extensions, and recursion rules should Counter use? What confidence threshold and ambiguity flow should be used?
-8. Should recursive discovery follow symlinks/junctions? The current recommendation is no by default, but this is not approved.
-9. Which path/size/time/file-ID checks should Purge require, and when is digest re-verification justified?
-10. How should SHA-256 exemptions be stored, invalidated, and de-exempted?
-11. What versioning and release process should be adopted?
-12. Is the GPLv3 FFmpeg distribution strategy acceptable for an MIT project? What source/notice package and delivery channels will be maintained?
-13. Who is the MIT copyright holder, and what year should appear in `LICENSE`?
-14. Who owns or created the supplied icon artwork, and what attribution/license applies?
+1. Which formats and exact extensions have a sufficiently meaningful v1.0.0 validation method?
+2. What exact per-format algorithms, thresholds, sampling/decode depth, and resource limits define each profile?
+3. What configurable timeout values and non-corruption classifications apply per adapter?
+4. What versioned profile/cache schema migration and recovery behavior is required?
+5. What filesystem identity fields are available and required on supported Windows 11 filesystems for safe Purge?
+6. How should file-symlink entries themselves be represented in Counter and handled by Purge without following targets?
+7. What sequence grammar and confidence scoring should automatic Counter inference use?
+8. Which external-tool version range is compatible, and how should configured executable paths and paired tools be checked?
+9. What accessibility, packaging, and Windows 11 verification is required for the approved GUI stack?
+10. Which representative real-file and stress-test corpora are approved for accuracy and performance evaluation?
+11. What release testing and owner-approval checklist will gate tags and GitHub Releases?
+
+## Versioning and releases — confirmed
+
+Use Semantic Versioning: `0.x.x` during initial development and `1.0.0` for the first stable public release. Patch releases carry backward-compatible fixes, minor releases backward-compatible features, and major releases breaking compatibility changes. Maintain `CHANGELOG.md`; use versioned Git tags such as `v1.0.0`; publish artifacts through GitHub Releases with SHA-256 checksums and dependency versions documented. Require testing and explicit owner approval before publication.
 
 ## Counter — confirmed scope, open grammar
 
@@ -112,4 +135,4 @@ The legacy application lists 17 image, 14 video, 10 audio, 14 document, and 7 ar
 - **External-tool candidates:** common video/container and audio families through a selected FFmpeg/FFprobe build. Probe-only results are metadata/stream checks; selected profiles may decode bounded packets or content. Exact extensions and checks depend on the executable audit and benchmarks.
 - **Limited or uncertain; defer from initial automatic support unless dedicated tooling is approved:** proprietary camera RAW variants; SVG as an image (XML parsing is not renderer/security validation); old binary Office formats (`.doc`, `.ppt`); RAR and 7z; MOBI; and legacy/specialized `.kpub` and `.pez`. Basic header readability alone must not be reported as integrity validation.
 
-The product expectation remains multi-format, format-specific validation across Video, Audio, Images, Archives, and Documents. This staged list recommends first-release scope; approval is needed before any formats are excluded or any format is advertised as validated. See [Architecture: format coverage](ARCHITECTURE.md#initial-format-coverage-proposal).
+The product expectation remains multi-format, format-specific validation across Video, Audio, Images, Archives, and Documents. This staged list recommends first-release scope; approval is needed before any formats are excluded or any format is advertised as validated. See [Architecture: format coverage](ARCHITECTURE.md#v100-format-scope).

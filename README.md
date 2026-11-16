@@ -8,13 +8,15 @@ The confirmed product direction, workflow, safety requirements, and open decisio
 
 ## Development
 
-The implementation language is Python. CustomTkinter is the preferred GUI framework, pending final technical evaluation. No application functionality is implemented yet.
+The implementation language is Python 3.13, 64-bit. The approved GUI stack is CustomTkinter for the primary interface, `ttk.Treeview` for results tables, and standard Tkinter utilities for native dialogs and supporting functionality. No application functionality is implemented yet.
 
 The target is Windows 11, 64-bit only. Windows 10 is not a Validata target.
 
 ## Portable data
 
-The intended portable mode stores settings, cache, and logs beside the executable when that directory is writable. If it is not, the proposal is to use a predictable per-user fallback and tell the user which location is active. See the storage proposal in [Architecture](docs/ARCHITECTURE.md#portable-data-location). The exact fallback behavior remains subject to review.
+Portable mode stores `settings.json`, `cache.json`, and `validata.log` beside the executable when writable. Otherwise it uses `%LOCALAPPDATA%\Validata\`. Settings must show the active storage path. See [Architecture](docs/ARCHITECTURE.md#portable-data-location).
+
+FFmpeg and FFprobe are user-managed optional dependencies: Validata will not download, bundle, or redistribute them in v1.0.0. Users can configure their independently obtained executable locations. Without these tools, validation methods that do not require them remain available; see [Third-party notices](docs/THIRD_PARTY_NOTICES.md).
 
 ## Legacy reference
 
@@ -22,4 +24,4 @@ Bulk Media Validator is reference material only. Validata is greenfield: no lega
 
 ## License
 
-Validata's source-code license is MIT. The copyright holder and year still need to be supplied before a complete `LICENSE` file can be added; no name has been inferred. Third-party components have separate terms. The supplied FFmpeg/FFprobe binaries are GPLv3-configured; see [Third-party notices](docs/THIRD_PARTY_NOTICES.md). Their redistribution strategy has not been approved.
+Validata source code is licensed under the [MIT License](LICENSE), copyright (c) 2026 hectordoesgorug. Third-party components have separate terms. Validata does not bundle or redistribute FFmpeg/FFprobe; users obtain those tools independently. Any future redistribution requires a separate licensing and compliance review.

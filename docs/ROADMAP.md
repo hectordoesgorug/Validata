@@ -4,19 +4,20 @@ This is a proposed sequence of work, not an approved feature schedule. Release d
 
 ## Stage 0 — Foundation (current)
 
-- Record confirmed requirements, architecture proposals, open questions, and technical recommendations.
-- Review the local repository setup and approve the architecture and unresolved choices with the product/planning owner.
+- Record owner-approved requirements, architecture boundaries, and implementation details still requiring technical work.
+- Keep the approved target at Windows 11 x64/Python 3.13 x64 with the approved Tkinter GUI stack and user-managed optional FFmpeg/FFprobe.
 
 ## Stage 1 — Technical spikes and decisions
 
-- Confirm minimum Python version for the Windows 11 x64 target; complete CustomTkinter evaluation with ttk Treeview and packaging behavior.
-- Define first-release supported formats and evidence-based profile checks.
+- Establish technically meaningful v1.0.0 extension coverage and evidence-based per-format checks across all five approved categories.
+- Benchmark Quick/Balanced/Thorough methods, configurable timeouts, decoding/reading limits, and truthful result classifications.
 - Prototype bounded task/event queues, publish-discovery-before-enqueue ordering, cancellation, completion accounting, and responsiveness using synthetic datasets.
-- Approve portable data fallback, copy isolation, visibility/migration behavior; validate file identity strategies for safe Purge.
-- Obtain owner approval for FFmpeg redistribution strategy; verify matching Corresponding Source and dependency notices or evaluate another build.
-- Specify Counter detection and manual configuration behavior with representative naming examples.
-- Approve staged first-release format coverage; validate profile inheritance and method definitions.
-- Obtain the MIT copyright holder/year and establish icon asset provenance before creating complete license/attribution materials.
+- Verify portable read/write probing, `%LOCALAPPDATA%\Validata\` fallback, visible active path, settings/cache persistence, and atomic cache writes.
+- Validate file-identity/Purge behavior, cancellation of external processes, and symlink/junction traversal policies on Windows 11.
+- Specify Counter inference confidence, sequence grammar, and ambiguity UX using representative examples.
+- Verify configured FFmpeg/FFprobe path/version compatibility and exercise independent checks when either tool is unavailable.
+- Verify CustomTkinter, `ttk.Treeview`, standard Tk dialogs, main-thread-only updates, and packaging on Windows 11.
+- Define representative real-file/stress corpora and the owner-approved release test checklist.
 
 ## Stage 2 — Application foundation
 
@@ -42,10 +43,12 @@ This is a proposed sequence of work, not an approved feature schedule. Release d
 - Exercise 1k, 10k, and 50k workloads; nested trees; mixed formats; cancellation; network/permission failures; long paths; GUI responsiveness; and memory use.
 - Test portable storage for writable/read-only directories, moved copies, and multiple copies.
 - Test PyInstaller one-folder packaging, writable-data behavior, then the candidate one-file release build.
-- Complete dependency inventory, FFmpeg license/notice/source handling, version metadata, and release documentation.
+- Complete dependency inventory, external-tool documentation, version metadata, SHA-256 artifact checksums, and release documentation.
+- Verify no FFmpeg/FFprobe binaries are included in Git, PyInstaller bundles, portable ZIPs, or GitHub Releases.
+- Publish only after all checks pass and the owner explicitly approves the SemVer tag and GitHub Release.
 
 No Validator or Counter implementation is included in the current foundation assignment.
 
-## Proposed next milestone
+## Next milestone
 
-Recommend **Handover 2.0 — Application Foundation** only after the owner has reviewed and approved the remaining architecture choices that affect the shell, job lifecycle, storage, and release dependency model. That handover should authorize a narrowly scoped foundation (package shell, GUI/event bridge, job coordinator, settings/cache/logging, and tests) while continuing to defer Validator and Counter behavior until separately approved.
+Recommend **Handover 2.0 — Application Foundation** as the next milestone. Its scope should implement the approved package shell, GUI/event bridge, job coordinator, settings/cache/logging, and tests. Validator and Counter capabilities should follow the technical spikes and retain the approved read-only and safety boundaries.
